@@ -57,10 +57,10 @@ def predict_bad_flag_ensemble(
         + y_pred_onus_prob
     ) / 4.0
 
-    # Binary prediction at 0.5 threshold
-    y_pred_ensemble_bin = (y_pred_ensemble_prob > 0.5).astype(int)
+    # # Binary prediction at 0.5 threshold
+    # y_pred_ensemble_bin = (y_pred_ensemble_prob > 0.5).astype(int)
 
-    return y_pred_ensemble_prob, y_pred_ensemble_bin
+    return y_pred_ensemble_prob
 
 
 if __name__ == "__main__":
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     onus_cols = [col for col in new_df.columns if col.startswith("onus")]
 
     # Predict using the ensemble
-    y_pred_probs, y_pred_classes = predict_bad_flag_ensemble(
+    y_pred_probs = predict_bad_flag_ensemble(
         df_new=new_df,
         model_paths=model_paths,
         transaction_cols=transaction_cols,
@@ -94,9 +94,10 @@ if __name__ == "__main__":
 
     # Show results
     print("Predicted Probabilities (first 10):", y_pred_probs[:10])
-    print("Predicted Classes (first 10):", y_pred_classes[:10])
+
 
     # Optionally, add predicted classes as a column in your data
-    new_df["bad_flag"] = y_pred_classes
-    new_df.to_csv("ensemble_predictions.csv", index=False)
+    new_df["bad_flag"] = y_pred_probs
+    result_df = new_df[["account_number", "bad_flag"]]
+    result_df.to_csv("ensemble_predictions.csv", index=False)
     print("\nPredictions saved to ensemble_predictions.csv")
